@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const port = 3000;
+app.use(express.json());
 
 const list = [
     {id: 1, title: "Task 1", description: "Go to the gym", done: false},
@@ -24,10 +25,22 @@ app.get('/tasks/:id', (req, res) => {
     const taskId = parseInt(req.params.id);
     const task = list.find(t => t.id === taskId);
     if (!task) {
-        res.status(404).json({ "error": "Task not found" });
+        res.status(404).json({ "error": `Task ${taskId} not found` });
         return;
     }
     res.status(200).json(task);
+});
+
+app.post('/tasks', (req, res) => {
+    const title = req.body.title;
+    if(!title) {
+        res.status(400).json({ "error": "Title is required" }); 
+        return;
+    }
+
+    const newTask ={id: list.length +1, title: title, description: "", done: false};
+    list.push(newTask);
+    res.status(201).json(newTask);
 });
 
 app.listen(port, () => {
