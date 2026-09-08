@@ -3,6 +3,11 @@ const app = express();
 const port = 3000;
 app.use(express.json());
 
+const swaggerUi = require('swagger-ui-express');
+const openApiDocumentation = require('./openapi.json');
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiDocumentation));
+
 const list = [
     {id: 1, title: "Task 1", description: "Go to the gym", done: false},
     {id: 2, title: "Task 2", description: "Do the Laundry", done: false},

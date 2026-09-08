@@ -1,0 +1,156 @@
+{
+	"openapi": "3.0.3",
+	"info": {
+		"title": "Task API",
+		"version": "1.0.0"
+	},
+	"servers": [
+		{
+			"url": "http://localhost:3000"
+		}
+	],
+	"paths": {
+		"/": {
+			"get": {
+				"summary": "Get API information",
+				"responses": {
+					"200": {
+						"description": "API information",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"name": { "type": "string", "example": "Task API" },
+										"version": { "type": "string", "example": "1.0" },
+										"endpoints": { "type": "array", "items": { "type": "string" }, "example": ["/tasks"] }
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/health": {
+			"get": {
+				"summary": "Check API health",
+				"responses": {
+					"200": {
+						"description": "Service is healthy",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": { "status": { "type": "string", "example": "ok" } }
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/tasks": {
+			"get": {
+				"summary": "List all tasks",
+				"responses": {
+					"200": {
+						"description": "A list of tasks",
+						"content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Task" } } } }
+					}
+				}
+			},
+			"post": {
+				"summary": "Create a task",
+				"requestBody": {
+					"required": true,
+					"content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateTask" } } }
+				},
+				"responses": {
+					"201": {
+						"description": "Task created",
+						"content": { "application/json": { "schema": { "$ref": "#/components/schemas/Task" } } }
+					},
+					"400": { "description": "Title is required" }
+				}
+			}
+		},
+		"/tasks/{id}": {
+			"parameters": [
+				{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" }, "description": "Task ID" }
+			],
+			"get": {
+				"summary": "Get a task",
+				"responses": {
+					"200": {
+						"description": "The requested task",
+						"content": { "application/json": { "schema": { "$ref": "#/components/schemas/Task" } } }
+					},
+					"404": { "$ref": "#/components/responses/TaskNotFound" }
+				}
+			},
+			"put": {
+				"summary": "Update a task",
+				"requestBody": {
+					"required": true,
+					"content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateTask" } } }
+				},
+				"responses": {
+					"200": {
+						"description": "Task updated",
+						"content": { "application/json": { "schema": { "$ref": "#/components/schemas/Task" } } }
+					},
+					"400": { "description": "Title is required" },
+					"404": { "$ref": "#/components/responses/TaskNotFound" }
+				}
+			},
+			"delete": {
+				"summary": "Delete a task",
+				"responses": {
+					"204": { "description": "Task deleted" },
+					"404": { "$ref": "#/components/responses/TaskNotFound" }
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"Task": {
+				"type": "object",
+				"required": ["id", "title", "description", "done"],
+				"properties": {
+					"id": { "type": "integer", "example": 1 },
+					"title": { "type": "string", "example": "Task 1" },
+					"description": { "type": "string", "example": "Go to the gym" },
+					"done": { "type": "boolean", "example": false }
+				}
+			},
+			"CreateTask": {
+				"type": "object",
+				"required": ["title"],
+				"properties": {
+					"title": { "type": "string", "example": "New task" }
+				}
+			},
+			"UpdateTask": {
+				"type": "object",
+				"required": ["title"],
+				"properties": {
+					"title": { "type": "string", "example": "Updated task" },
+					"description": { "type": "string", "example": "Updated description" },
+					"done": { "type": "boolean", "example": true }
+				}
+			},
+			"Error": {
+				"type": "object",
+				"properties": { "error": { "type": "string", "example": "Task 99 not found" } }
+			}
+		},
+		"responses": {
+			"TaskNotFound": {
+				"description": "Task not found",
+				"content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+			}
+		}
+	}
+}
