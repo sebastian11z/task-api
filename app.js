@@ -43,6 +43,38 @@ app.post('/tasks', (req, res) => {
     res.status(201).json(newTask);
 });
 
+app.put('/tasks/:id', (req, res) => {
+    const taskId = parseInt(req.params.id);
+    const task = list.find(t=> t.id === taskId);
+
+    if(!task) {
+        res.status(404).json({ "error": `Task ${taskId} not found` });
+        return;
+    }
+    if (!req.body.title){
+        res.status(400).json({ "error": "Title is required" });
+        return;
+    }
+    
+    task.title = req.body.title || task.title;
+    task.description = req.body.description || task.description;
+    task.done = req.body.done !== undefined ? req.body.done : task.done;
+    res.status(200).json(task);
+});
+
+app.delete('/tasks/:id', (req, res) => {
+    const taskId = parseInt(req.params.id);
+    const index = list.findIndex(t => t.id === taskId);
+
+    if (index === -1) {
+        res.status(404).json({ "error": `Task ${taskId} not found` });
+        return;
+    }   
+
+    list.splice(index, 1);
+    res.status(204).send();
+});
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
